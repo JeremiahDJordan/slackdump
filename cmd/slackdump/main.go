@@ -39,12 +39,10 @@ import (
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/convertcmd"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/diag"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/dump"
-	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/emoji"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/export"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/format"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/golang/base"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/golang/help"
-	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/list"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/man"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/mcp"
 	"github.com/rusq/slackdump/v4/cmd/slackdump/internal/resume"
@@ -61,11 +59,10 @@ func init() {
 		archive.CmdArchive,
 		export.CmdExport,
 		dump.CmdDump,
-		archive.CmdSearch,
+		// single-channel mode: search, list and emoji enumerate the whole
+		// workspace, so they are not available.
 		resume.CmdResume,
 		convertcmd.CmdConvert,
-		list.CmdList,
-		emoji.CmdEmoji,
 		diag.CmdDiag,
 		apiconfig.CmdConfig,
 		format.CmdFormat,

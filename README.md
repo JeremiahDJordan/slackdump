@@ -3,6 +3,31 @@
 Purpose:  archive your private and public Slack messages, users, channels,
 files and emojis.  Generate Slack Export without admin privileges.
 
+> [!IMPORTANT]
+> # Single-channel mode (this fork)
+>
+> This fork of [rusq/slackdump](https://github.com/rusq/slackdump) is
+> restricted to fetching one conversation at a time, at a pace similar to
+> browsing the channel in the Slack client:
+>
+> - `archive`, `dump`, `export` and `resume` require exactly one channel ID or
+>   URL (thread links within that channel are allowed).
+> - Workspace-wide listing and search API calls (`users.list`,
+>   `conversations.list`, `users.conversations`, `search.*`, `client.userBoot`,
+>   `emoji.list` and similar) are refused at the HTTP transport level, so no
+>   command or flag can make them.  The `list`, `search`, `emoji` and
+>   `tools edge` commands are removed.
+> - All requests to Slack share one pacer: at most one request every 2 seconds
+>   after a burst of 3 (`internal/network/guard.go`).
+> - `-channel-users` is on, file attachments are off (`-files` to enable),
+>   and `-time-from` defaults to 30 days ago.
+>
+> Example:
+> ```shell
+> slackdump archive https://yourco.slack.com/archives/C0123456789
+> slackdump archive -time-from 2026-01-01T00:00:00 C0123456789
+> ```
+
 [![Slackdump screenshot](doc/slackdump.webp)](https://github.com/rusq/slackdump/releases/)
 
 **Quick links**:

@@ -38,6 +38,10 @@ const (
 	filenameLayout = "20060102_150405"
 )
 
+// DefaultHistoryDays is how many days of history are fetched when -time-from
+// is not specified.
+const DefaultHistoryDays = 30
+
 var (
 	TraceFile      string
 	LogFile        string
@@ -55,8 +59,8 @@ var (
 	NoEncryption    bool   // disable encryption
 
 	MemberOnly          bool
-	OnlyChannelUsers    bool
-	IncludeCustomLabels bool // Requests labels for user custom fields, use with caution due to request throttling.
+	OnlyChannelUsers    = true // fetching all users is disabled in single-channel mode.
+	IncludeCustomLabels bool   // Requests labels for user custom fields, use with caution due to request throttling.
 	// ChannelTypes lists channel types to fetch.
 	ChannelTypes = slackChanTypes(slackdump.AllChanTypes)
 	// FailOnNonCritical enables hard fail on non-critical errors, such as
@@ -69,8 +73,9 @@ var (
 	RecordFiles bool // record file chunks in chunk files.
 
 	// Oldest is the default timestamp of the oldest message to fetch, that is
-	// used by the dump and export commands.
-	Oldest = TimeValue(time.Time{})
+	// used by the dump and export commands.  In single-channel mode it
+	// defaults to DefaultHistoryDays before today (UTC).
+	Oldest = TimeValue(time.Now().UTC().AddDate(0, 0, -DefaultHistoryDays).Truncate(24 * time.Hour))
 	// Latest is the default timestamp of the newest message to fetch, that is
 	// used by the dump and export commands.  It is set to an exact value
 	// for the dump to be consistent.
@@ -243,7 +248,7 @@ func SetBaseFlags(fs *flag.FlagSet, mask FlagMask) {
 		fs.BoolVar(&NoEncryption, "no-encryption", osenv.Value("DISABLE_ENCRYPTION", false), "disable encryption for cache and credential files")
 	}
 	if mask&OmitWithFilesFlag == 0 {
-		fs.BoolVar(&WithFiles, "files", true, "enables file attachments download (to disable, specify: -files=false)")
+		fs.BoolVar(&WithFiles, "files", false, "enables file attachments download")
 		if mask&OmitRecordFilesFlag == 0 {
 			fs.BoolVar(&RecordFiles, "files-rec", false, "include file chunks in chunk files")
 		}
@@ -286,7 +291,7 @@ func SetBaseFlags(fs *flag.FlagSet, mask FlagMask) {
 		fs.BoolVar(&MemberOnly, "member-only", false, "export only channels, which the current user belongs to (if no channels are specified)")
 	}
 	if mask&OmitCustomUserFlags == 0 {
-		fs.BoolVar(&OnlyChannelUsers, "channel-users", false, "export only users involved in the channel, and skip fetching of all users")
+		fs.BoolVar(&OnlyChannelUsers, "channel-users", true, "export only users involved in the channel (required: fetching all users is disabled in single-channel mode)")
 		fs.BoolVar(&IncludeCustomLabels, "custom-labels", false, "request user's custom fields labels, may result in requests being throttled hard")
 	}
 	if mask&OmitChunkFileMode == 0 {

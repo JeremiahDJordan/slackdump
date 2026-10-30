@@ -163,6 +163,10 @@ func runResume(ctx context.Context, cmd *base.Command, args []string) error {
 		cfg.Log.InfoContext(ctx, "all resume entities were skipped by stale filters", "database", dir, "skipped", latestResult.skippedStale)
 		return nil
 	}
+	if err := bootstrap.SingleChannel(latestResult.list); err != nil {
+		base.SetExitStatus(base.SInvalidParameters)
+		return err
+	}
 
 	client, err := bootstrap.Slack(ctx)
 	if err != nil {

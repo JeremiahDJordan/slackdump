@@ -106,6 +106,10 @@ func RunDump(ctx context.Context, _ *base.Command, args []string) error {
 		base.SetExitStatus(base.SInvalidParameters)
 		return ErrNothingToDo
 	}
+	if err := bootstrap.SingleChannel(list); err != nil {
+		base.SetExitStatus(base.SInvalidParameters)
+		return err
+	}
 
 	// initialize the file naming template.
 	if opts.nameTemplate == "" {

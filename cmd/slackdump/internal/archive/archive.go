@@ -78,6 +78,10 @@ func runChunkArchive(ctx context.Context, _ *base.Command, args []string) error 
 		base.SetExitStatus(base.SUserError)
 		return err
 	}
+	if err := bootstrap.SingleChannel(list); err != nil {
+		base.SetExitStatus(base.SInvalidParameters)
+		return err
+	}
 	client, err := bootstrap.Slack(ctx)
 	if err != nil {
 		base.SetExitStatus(base.SInitializationError)
@@ -113,6 +117,10 @@ func runDBArchive(ctx context.Context, cmd *base.Command, args []string) error {
 	list, err := structures.NewEntityList(args)
 	if err != nil {
 		base.SetExitStatus(base.SUserError)
+		return err
+	}
+	if err := bootstrap.SingleChannel(list); err != nil {
+		base.SetExitStatus(base.SInvalidParameters)
 		return err
 	}
 	client, err := bootstrap.Slack(ctx)

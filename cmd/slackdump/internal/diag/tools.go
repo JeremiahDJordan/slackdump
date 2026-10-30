@@ -40,7 +40,6 @@ Tools command contains different tools, running which may be requested if you op
 		cmdCleanup,
 		cmdConvertV1,
 		cmdDedupe,
-		cmdEdge,
 		cmdEncrypt,
 		cmdEzTest,
 		cmdHydrate,

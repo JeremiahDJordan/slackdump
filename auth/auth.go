@@ -30,6 +30,8 @@ import (
 	"github.com/rusq/chttp/v2"
 	"github.com/rusq/slack"
 	"github.com/rusq/slackauth"
+
+	"github.com/rusq/slackdump/v4/internal/network"
 )
 
 const SlackURL = "https://slack.com"
@@ -145,12 +147,18 @@ func (s simpleProvider) Test(ctx context.Context) (*slack.AuthTestResponse, erro
 }
 
 func (s simpleProvider) HTTPClient() (*http.Client, error) {
-	return chttp.New(
+	cl, err := chttp.New(
 		SlackURL,
 		s.Cookies(),
 		chttp.WithUserAgent(slackauth.DefaultUserAgent),
 		chttp.WithUTLS(&utls.Config{}),
 	)
+	if err != nil {
+		return nil, err
+	}
+	// single-channel mode: refuse workspace-wide listings and pace requests.
+	cl.Transport = network.GuardTransport(cl.Transport)
+	return cl, nil
 }
 
 func pleaseWait(ctx context.Context, msg string) func() {
